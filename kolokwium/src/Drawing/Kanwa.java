@@ -10,20 +10,28 @@ import java.util.Random;
 
 public class Kanwa extends JPanel implements ActionListener {
     private List<Square> squares = new ArrayList<>();
+
+    public Square getActive_square() {
+        return active_square;
+    }
+
+    private Square active_square = null;
     private Random r = new Random();
     Image image;
     Graphics2D device;
     Graphics2D buffer;
     private Timer timer;
+    private Timer square_timer;
     private int delay = 10;
     private int square_size = 30;
     private List<Integer> x_spawning_points = new ArrayList<>();
-    public Kanwa(int width, int height){
-        setSize(width, height);
+
+    public Kanwa(){
+        super();
         setBackground(Color.YELLOW);
         setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
-        setLayout(null);
         timer = new Timer(delay, this);
+        square_timer = new Timer(6000, null);
     }
 
     public void initialize(){
@@ -40,32 +48,38 @@ public class Kanwa extends JPanel implements ActionListener {
             x_spawning_points.add(start_x);
             start_x += square_size;
         }
+        addSquare();
+        square_timer.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                addSquare();
+            }
+        });
+        square_timer.start();
+    }
 
+    public void animate(){
+        if (timer.isRunning()) {
+            timer.stop();
+        } else {
+            timer.start();
+        }
     }
 
     void addSquare(){
         int random_x = r.nextInt(x_spawning_points.size());
-        Square s = new Square(random_x, -square_size, square_size, getHeight(), this.delay);
+        Square s = new Square(this.buffer, x_spawning_points.get(random_x), -square_size, square_size, getHeight(), this.delay, this.squares);
+        active_square = s;
         squares.add(s);
         timer.addActionListener(s);
         new Thread(s).start();
     }
     @Override
     public void actionPerformed(ActionEvent e) {
+        if(active_square != null && active_square.isGrounded()){
+            active_square = null;
+        }
         device.drawImage(image, 0, 0, null);
         buffer.clearRect(0, 0, getWidth(), getHeight());
-    }
-    @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        Graphics2D g2d = (Graphics2D) g.create();
-
-        try{
-            for(Square s : squares){{
-                s.draw(g2d);
-            }}
-        } finally {
-            g2d.dispose();
-        }
     }
 }
