@@ -5,7 +5,7 @@ import Drawing.Kanwa;
 import javax.swing.*;
 
 public class MainFrame extends JFrame {
-    private int WIDTH = 800;
+    private int WIDTH = 810;
     private int HEIGHT = 600;
     public MainFrame(){
         super("Opadające kwadraty");
@@ -16,7 +16,7 @@ public class MainFrame extends JFrame {
         setContentPane(mainPanel);
         mainPanel.setLayout(null);
 
-        Kanwa kanwa = new Kanwa();
+        Kanwa kanwa = new Kanwa(WIDTH, HEIGHT);
         kanwa.setBounds(0, 0, WIDTH, HEIGHT);
         mainPanel.add(kanwa);
     }
